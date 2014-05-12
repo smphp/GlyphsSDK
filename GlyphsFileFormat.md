@@ -1,7 +1,8 @@
-# Glyphs File Format Version 1
-Glyphs stores data using the Apple property list format. It saves the "old style text" format as it save a lot space. The XML based flavor is also supported.  So the files can be view sand edited with any text editor. Please have a look a existing file for details. 
+# Glyphs File Format, Version 1
+Glyphs stores data using the Apple property list (plist) format. It saves its files in plaintext format, because it saves a lot of space, but the XML-based flavour is also supported. So, the files can be viewed and edited with any text editor. Open an existing `.glyphs` file to see how it works.
+
 ## Top Level Elements
-The XML file contains a dictionary with the following structure. The elements with child elements are usually a `list` of `dict`s.
+The XML file contains a dictionary with the following structure. The elements with child elements are usually a `list` of `dict` elements.
 
 * DisplayStrings `list`
 * classes `list`: OpenType classes.
@@ -29,9 +30,9 @@ The XML file contains a dictionary with the following structure. The elements wi
     * capHeight `int`
     * customParameters `list`: Master-wide custom parameters.
         * name `string`: Property name of the custom parameter.
-        * value `string`: Value of the custom parameters.
-    * descender `int` is always negative
-    * horizontalStems `list` a list of `ints`
+        * value `string`: Value of the custom parameter.
+    * descender `int`: is always negative.
+    * horizontalStems `list`: a list of `int` values.
     * id `string` a unique id that connects the layers (associated ID) with the master.
     * userData `dict` to store custom data. Only `string`, `int`, `float`, `array`, `dict` and `date` data is allowed.
     * weightValue `int`: The width position for interpolation. Is only present if the value is not `100`.
@@ -69,13 +70,13 @@ The XML file contains a dictionary with the following structure. The elements wi
         * name `string`: Property name of the custom parameter.
         * value `string`: Value of the custom parameters.
 * kerning `dict`: three-level `dict` containing a `float` as value.
-    * first level key is the master ID
-    * second level is either the left kerning group name or glyph name
-    * third level is either the right kerning group name or glyph name
+    * first level key is the master ID.
+    * second level is either the left kerning group name or glyph name.
+    * third level is either the right kerning group name or glyph name.
 * manufacturer `string`
 * manufacturerURL `string`
 * unitsPerEm `int`
 * userData `dict`
 * versionMajor `int`
-* versionMinor `int` between 0 and 999.
+* versionMinor `int`: must be between 0 and 999.
 
