@@ -799,15 +799,20 @@ Observers = (DOCUMENTOPENED, DOCUMENTACTIVATED, DOCUMENTWASSAVED, DOCUMENTEXPORT
 callbackOperationTargets = {}
 
 class callbackHelperClass(NSObject):
-	def __init__(self, func, operation):
+	def __init__(self, func, operation, observer = None):
 		self.func = func
 		self.operation = operation
+		self.observer = observer
 		
 	def __new__(typ, *args, **kwargs):
 		self = callbackHelperClass.alloc().init()
 		if len(args) > 1:
 			self.func = args[0]
 			self.operation = args[1]
+		if len(args) > 2:
+			self.observer = args[2]
+		else:
+			self.observer = None
 		return self
 
 	def drawForegroundForLayer_options_(self, Layer, options):
@@ -839,7 +844,7 @@ class callbackHelperClass(NSObject):
 			LogError(traceback.format_exc())
 
 
-def __addCallback__(self, target, operation):
+def __addCallback__(self, target, operation, observer = None):
 
 	# Remove possible old function by the same name
 	try:
@@ -868,9 +873,15 @@ def __addCallback__(self, target, operation):
 		# Other observers
 		elif operation in Observers:
 			# Add class to callbackTargets dict by the function name
-			callbackTargets[target.__name__] = callbackHelperClass(target, operation)
-			selector = objc.selector(callbackTargets[target.__name__].callback, signature="v@:@")
-			NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(callbackTargets[target.__name__], selector, operation, objc.nil)
+			if observer and isinstance(observer, NSObject):
+				assert isinstance(target, objc.python_selector)
+				NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(observer, target, operation, objc.nil)
+			else:
+				callbackHelper = callbackHelperClass(target, operation, observer)
+				if observer is not None:
+					callbackTargets[target.__name__] = callbackHelperClass(target, operation)
+				selector = objc.selector(callbackHelper.callback, signature="v@:@")
+				NSNotificationCenter.defaultCenter().addObserver_selector_name_object_(callbackHelper, selector, operation, objc.nil)
 	except:
 		NSLog(traceback.format_exc())
 
@@ -929,12 +940,12 @@ def __do__removeCallback___(self, target, operation):
 			NSNotificationCenter.defaultCenter().removeObserver_(callbackTargets[target.__name__])
 			del(callbackTargets[target.__name__])
 
-def __removeCallback___(self, target, operation = None):
+def __removeCallback___(self, target, operation = None, observer = None):
 	if operation != None:
-		__do__removeCallback___(self, target, operation)
+		__do__removeCallback___(self, target, operation, observer)
 	else:
 		for operation in callbackOperationTargets.allKeys():
-			__do__removeCallback___(self, target, operation)
+			__do__removeCallback___(self, target, operation, observer)
 
 
 GSApplication.removeCallback = __removeCallback___
